@@ -11,7 +11,8 @@ const UserSchema = new mongoose.Schema({
     Email:{
         type:String,
         required:true
-    }
+    },
+    Secrets:[String]
 })
 
 UserSchema.methods.generateToken=async function(){

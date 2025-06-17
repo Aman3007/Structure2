@@ -7,14 +7,17 @@ const createUser = async (req, res) => {
     if (await User.findOne({ Name: name })) {
       if (await User.findOne({ Email: email })) {
         res.send({ message: "you are already register please go to log in page" })
+        return;
       } 
       else {
         res.send({ message: "Aleary a similer usernsme please use another one" })
+        return;
       }
     }
     else {
       if (await User.findOne({ Email: email })) {
         res.send({ message: "Already existing another user with same email please use another one " })
+        return;
       }
 
       else {
@@ -59,7 +62,8 @@ export const checkUser = async (req, res) => {
           user: {
             id: user._id,
             name: user.Name,
-            email: user.Email
+            email: user.Email,
+            secrets:user.Secrets
           },
           token
         });
@@ -72,10 +76,13 @@ export const checkUser = async (req, res) => {
 
       if (nameExists && !emailExists) {
         res.send({ message: "Incorrect email" });
+        return;
       } else if (!nameExists && emailExists) {
         res.send({ message: "Incorrect username" });
+        return;
       } else {
         res.send({ message: "You are not registered. Please register first." });
+        return;
       }
     }
 
@@ -86,7 +93,28 @@ export const checkUser = async (req, res) => {
 };
 
 
+export const addsecrets=async(req,res)=>{
+ const { formData, user } = req.body;
+   try {
+await User.updateOne({ _id: user.id }, { $push: { Secrets: formData.secrets } });
 
+
+const updatedUser = await User.findById(user.id);
+
+
+if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+ res.status(200).send({ secrets: updatedUser.Secrets });
+    
+
+   } catch (error) {
+      console.log(error)
+   }
+
+
+}
 
 
 
